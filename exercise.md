@@ -28,8 +28,8 @@ Cans
 
 1. Get two values from the line
 
-   > [!WARNING]
-   > Chosen coordinates
+> [!WARNING]
+> Chosen coordinates
 
    - m1 [2, 4]
    - m2 [4, 0]
