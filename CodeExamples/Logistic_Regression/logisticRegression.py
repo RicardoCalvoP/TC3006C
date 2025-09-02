@@ -1,0 +1,161 @@
+import numpy as np
+import math
+import random
+import os
+
+
+def sigmoid(z):
+    """
+    Computes the sigmoid function for a given input z.
+    """
+    return 1 / (1 + math.exp(-z))
+
+
+def gradient(sampleList, weights):
+    sumElements = 0.0
+
+    for x, y in zip(sampleList, weights):
+        sumElements += (x*y)
+
+    return sigmoid(sumElements)
+
+
+def stochasticGradientAscent(trainingLists, trainingLabels, featureNumber, iterations=150):
+    # Get the number of training samples
+    sampleNumber = len(trainingLists)
+
+    # Create a list of N features (featureNumber) for saving optimal weights (1.0 as initial value)
+    weights = [1.0] * featureNumber
+    # Iterate a fixed number of times for getting optimal weights
+    for x in range(iterations):
+        # Get the index number of training samples
+        sampleIndex = list(range(sampleNumber))
+        # For each training sample do the following
+        for y in range(sampleNumber):
+            """
+            Alpha is the learning rate and controls how much the coefficients (and therefore the model)
+            changes or learns each time it is updated.
+            Alpha decreases as the number of iterations increases, but it never reaches 0
+            """
+            alpha = 4/(1.0+x+y)+0.01
+            # Randomly obtain an index of one of training samples
+            """
+      Here, you’re randomly selecting each instance to use in updating the weights.
+      This will reduce the small periodic variations that can be present if we analyze
+      everything sequentially
+      """
+            randIndex = int(random.uniform(0, len(sampleIndex)))
+            # Obtain the gradient from the current training sample and weights
+            sampleGradient = gradient(trainingLists[randIndex], weights)
+            # Check the error rate
+            error = trainingLabels[randIndex]-sampleGradient
+            """
+      we are calculating the error between the actual class and the predicted class and
+      then moving in the direction of that error (CURRENT TRAINING PROCESS)
+      """
+            temp = []
+            for index in range(featureNumber):
+                temp.append(alpha*(error*trainingLists[randIndex][index]))
+
+            for z in range(featureNumber):
+                weights[z] = weights[z] + temp[z]
+
+            del (sampleIndex[randIndex])
+    return weights
+
+
+def classifyList(testList, weights):
+    sumElements = 0
+    # Multiply all features and optimized weights
+    for x, y in zip(testList, weights):
+        sumElements = sumElements+(x*y)
+        # Obtain the sigmoid output which will tell us the class a test vector belongs
+        probability = sigmoid(sumElements)
+    if probability > 0.5:
+        return 1.0
+    else:
+        return 0.
+
+
+def logisticRegression():
+    base_path = "./CodeExamples/Logistic_Regression/Data/"
+
+    num_data = 100
+
+    # Ensure the directory exists
+    os.makedirs(base_path, exist_ok=True)
+
+    # Create training dataset
+    feature1 = list(np.random.normal(0, 0.2, num_data))
+    feature2 = list(np.random.normal(0, 0.2, num_data))
+    feature3 = list(np.random.normal(0, 0.2, num_data))
+    feature4 = list(np.random.normal(0, 0.2, num_data))
+    feature5 = list(np.random.normal(0, 0.2, num_data))
+    label = list(np.random.choice([1.0, 0.0], size=50, p=[0.5, 0.5]))
+
+    with open(base_path + "regressionTraining.txt", "w") as file:
+        for f1, f2, f3, f4, f5, l in zip(feature1, feature2, feature3, feature4, feature5, label):
+            file.write(str(f1)+","+str(f2)+","+str(f3)+"," +
+                       str(f4)+","+str(f5)+","+str(l)+"\n")
+
+    # Create test dataset
+    feature1 = list(np.random.normal(0, 0.2, 50))
+    feature2 = list(np.random.normal(0, 0.2, 50))
+    feature3 = list(np.random.normal(0, 0.2, 50))
+    feature4 = list(np.random.normal(0, 0.2, 50))
+    feature5 = list(np.random.normal(0, 0.2, 50))
+    label = list(np.random.choice([1.0, 0.0], size=50, p=[0.5, 0.5]))
+
+    with open(base_path + "regressionTest.txt", "w") as file:
+        for f1, f2, f3, f4, f5, l in zip(feature1, feature2, feature3, feature4, feature5, label):
+            file.write(str(f1)+","+str(f2)+","+str(f3)+"," +
+                       str(f4)+","+str(f5)+","+str(l)+"\n")
+
+    # Training dataset
+    training = []
+    training_labels = []
+    # Test dataset
+    test = []
+    test_labels = []
+
+    # Number of repetitions for optimizing the weights
+    iterations = 100
+    # Number of features found in the dataset
+    featureNumber = 5
+
+    # Load training samples
+    with open(base_path + "regressionTraining.txt", "r") as file:
+        for line in file:
+            elements = line.strip().split(",")
+            training.append([float(element) for element in elements[:-1]])
+            training_labels.append(float(elements[-1]))
+
+    # Load test samples
+    with open(base_path + "regressionTest.txt", "r") as file:
+        for line in file:
+            elements = line.strip().split(",")
+            test.append([float(element) for element in elements[:-1]])
+            test_labels.append(float(elements[-1]))
+    test, test_labels = np.array(test), np.array(test_labels)
+
+    # Apply the stochastic gradient ascent for finding the weights that maximize features
+    optimalWeights = stochasticGradientAscent(
+        training, training_labels, featureNumber, iterations)
+
+    # Use the obtained weights over test samples for clasifying
+    correctPredictions = 0
+
+    for x, y in zip(test, test_labels):
+        predicted = classifyList(x, optimalWeights)
+        if predicted == y:
+            correctPredictions = correctPredictions + 1
+
+        print("Predicted: "+str(predicted)+" realValue: "+str(y))
+
+    # Calculates model accuracy
+    accuracy = (correctPredictions / len(test_labels)) * 100
+    print("Model accuracy: "+str(accuracy)+"%")
+
+
+if __name__ == "__main__":
+    logisticRegression()
