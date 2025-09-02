@@ -9,6 +9,7 @@ import pandas as pd
 import sklearn
 import matplotlib as plt
 
+
 def read_file(file_path):
     X = []
     y = []
@@ -28,24 +29,30 @@ def read_file(file_path):
 
     return X, y
 
+
 def set_index(file, activation_funcs):
-    file.write("# Activity 2 logistic regression  with Scikit learn & manual\n\n") # Title
-    file.write("**Ricardo Calvo - A01028889**\n\n") # Author
-    file.write("## Table of Contents\n\n") # Subtitle
+    file.write(
+        "# Activity 2 logistic regression  with Scikit learn & manual\n\n")  # Title
+    file.write("**Ricardo Calvo - A01028889**\n\n")  # Author
+    file.write("## Table of Contents\n\n")  # Subtitle
 
     # Introduction
-    file.write("1. [Introduction](#introduction)\n") # Subtitle
+    file.write("1. [Introduction](#introduction)\n")  # Subtitle
     # Manual LR subtitles
-    file.write("1. [Manual LR](#manual-lr)\n") # Subtitle
+    file.write("1. [Manual LR](#manual-lr)\n")  # Subtitle
     for activation_func in activation_funcs:
-        file.write(f"   1. [Best {activation_func} results](#best-results-using-{activation_func.lower()}-distance-metric)\n")
+        file.write(
+            f"   1. [Best {activation_func} results](#best-results-using-{activation_func.lower()}-activation-function)\n")
 
     # Sklearn LR subtitles
-    file.write("2. [LR with Scikit learn](#lr-with-scikit-learn)\n") # Subtitle
+    # Subtitle
+    file.write("2. [LR with Scikit learn](#lr-with-scikit-learn)\n")
     for activation_func in activation_funcs:
-        file.write(f"   1. [Best {activation_func} results](#best-results-using-{activation_func.lower()}-distance-metric-scikit-learn)\n")
+        file.write(
+            f"   1. [Best {activation_func} results](#best-results-using-{activation_func.lower()}-activation-function-scikit-learn)\n")
 
-    file.write("1. [Conclusion](#conclusion)\n") # Subtitle
+    file.write("1. [Conclusion](#conclusion)\n")  # Subtitle
+
 
 def write_introduction(file):
     file.write("## Introduction\n\n")
@@ -68,15 +75,18 @@ def write_introduction(file):
     file.write("[Return to Table of Contents](#table-of-contents)\n\n --- \n\n")
 
 # Main function to execute RL
+
+
 def logistic_regression():
     # Load training and test data
-    traing_X, traing_y = read_file("Homeworks/DataScience/RLL/cancerTraining.txt")
+    traing_X, traing_y = read_file(
+        "Homeworks/DataScience/RLL/cancerTraining.txt")
     # Load test data
     test_X, test_y = read_file("Homeworks/DataScience/RLL/cancerTest.txt")
     # Initialize helper variables
     activation_funcs = ["sigmoide", "tanh"]
     # Create result file
-    filepath = "Homeworks/DataScience/KNN/knn_a01028889.md"
+    filepath = "Homeworks/DataScience/RLL/logistic_regression_a01028889.md"
 
     # If file exists, remove it
     if os.path.exists(filepath):
@@ -86,6 +96,7 @@ def logistic_regression():
     with open(filepath, "w", encoding="UTF-8") as file:
         set_index(file, activation_funcs)
         write_introduction(file)
+
 
 if __name__ == "__main__":
     logistic_regression()
